@@ -12,13 +12,13 @@ from rest_framework.test import APIClient
 
 from core.models import Recipe
 
-from recipe.serializers import RecipeSerializer
+from recipe.serializers import (RecipeSerializer, RecipeDetailSerializer)
 
 RECIPES_URL = reverse('recipe:recipe-list')
 
 def detail_url(user_id):
     """Return detailed url with ID"""
-    return reverse('recipe:recipe-list', args=[user_id])
+    return reverse('recipe:recipe-detail', args=[user_id])
 
 def create_recipe(user, **params):
     """Create a return a sample recipe."""
