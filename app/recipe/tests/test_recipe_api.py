@@ -12,7 +12,7 @@ from rest_framework.test import APIClient
 
 from core.models import Recipe
 
-from recipe.serializers import (RecipeSerializer, RecipeDetailSerializer)
+from recipe.serializers import (RecipeSerializer, RecipeDetailSerializer,)
 
 RECIPES_URL = reverse('recipe:recipe-list')
 
@@ -44,15 +44,14 @@ class PublicRecipeApiTest(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
-class PrivateRecipeApiTest(TestCase):
+class PrivateRecipeAPITest(TestCase):
     """Test unauthenticated API requests."""
 
     def setUp(self):
         self.client=APIClient()
         self.user = get_user_model().objects.create_user(
-            name ='test',
-            email= 'test@example.com',
-            password= 'pass123',
+            'user@example.com',
+            'testpass123',
         )
         self.client.force_authenticate(self.user)
 
@@ -86,12 +85,11 @@ class PrivateRecipeApiTest(TestCase):
 
     def test_get_recipe_detail(self):
         """Test get recipe Detail."""
-        recipe = Recipe.objects.create(user=self.user)
-
+        recipe = create_recipe(user=self.user)
         url = detail_url(recipe.id)
         res = self.client.get(url)
 
-        serializer = RecipeSerializer(recipe)
+        serializer = RecipeDetailSerializer(recipe)
         self.assertEqual(res.data, serializer.data)
 
 
