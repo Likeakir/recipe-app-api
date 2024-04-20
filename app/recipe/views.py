@@ -26,7 +26,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         """Create a new recipe"""
         serializer.save(user=self.request.user)
-class TagViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+class TagViewSet(mixins.UpdateModelMixin,
+                 mixins.ListModelMixin,
+                 viewsets.GenericViewSet):
     """Manage Tag in the database"""
     serializer_class = serializers.TagSerializer
     queryset= Tag.objects.all()
@@ -34,4 +36,4 @@ class TagViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return self.queryset.filter(user=self.resquest.user).order_by('-name')
+        return self.queryset.filter(user=self.request.user).order_by('-name')
