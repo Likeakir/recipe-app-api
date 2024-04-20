@@ -26,7 +26,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         """Create a new recipe"""
         serializer.save(user=self.request.user)
+
 class TagViewSet(mixins.UpdateModelMixin,
+                 mixins.DestroyModelMixin,
                  mixins.ListModelMixin,
                  viewsets.GenericViewSet):
     """Manage Tag in the database"""
