@@ -1,6 +1,8 @@
 """
 Test Ingredients API.
 """
+from decimal import Decimal
+
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.test import TestCase
@@ -8,8 +10,8 @@ from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from core.models import Ingredients
-from recipe.serializers import IngredientsSerializer
+from core.models import (Ingredients, Recipe)
+from recipe.serializers import (IngredientsSerializer,RecipeSerializer)
 
 INGREDIENTS_URL = reverse('recipe:ingredients-list')
 
@@ -94,6 +96,43 @@ class PrivateIngredientApiTest(TestCase):
         ingredients = Ingredients.objects.filter(user=self.user)
         self.assertFalse(ingredients.exists())
 
+    def test_filter_ingredients_assigned_to_recipe(self):
+        """Test listing ingredients by those asssigned to reciipes"""
+        in1 = Ingredients.objects.create(user=self.user, name='Apple')
+        in2 = Ingredients.objects.create(user=self.user, name='Pera')
+        recipe = Recipe.objects.create(
+            title='Apple Crumble',
+            time_minutes=5,
+            price=Decimal('5.50'),
+            user=self.user,
+        )
+        recipe.ingredient.add(in1)
+        res = self.client.get(INGREDIENTS_URL, {'assigned_only':1})
 
+        s1 = IngredientsSerializer(in1)
+        s2 = IngredientsSerializer(in2)
+        self.assertIn(s1.data, res.data)
+        self.assertNotIn(s2.data, res.data)
 
+    def test_filtered_ingredients_unique(self):
+        """Test filtered ingredients return a uniqye list"""
+        ing = Ingredients.objects.create(user=self.user, name='eggs')
+        Ingredients.objects.create(user=self.user, name='herbs')
+        recipe1 = Recipe.objects.create(
+            title='Apple Crumble',
+            time_minutes=5,
+            price=Decimal('5.50'),
+            user=self.user,
+        )
+        recipe2 = Recipe.objects.create(
+            title='Eggs Benedict',
+            time_minutes=5,
+            price=Decimal('5.50'),
+            user=self.user,
+        )
+        recipe1.ingredient.add(ing)
+        recipe2.ingredient.add(ing)
 
+        res =self.client.get(INGREDIENTS_URL, {'assigned_only':1})
+
+        self.assertEqual(len(res.data),1)
