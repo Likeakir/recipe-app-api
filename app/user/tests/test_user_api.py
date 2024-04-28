@@ -15,7 +15,7 @@ ME_URL = reverse('user:me')
 def create_user(**params):
     return get_user_model().objects.create_user(**params)
 
-class publicUserApiTests(TestCase):
+class PublicUserApiTests(TestCase):
 
     def setUp(self):
         self.client = APIClient()
