@@ -122,9 +122,6 @@ class TagViewSet(BaseRecipeAttrViewSet):
     serializer_class = serializers.TagSerializer
     queryset= Tag.objects.all()
 
-
-    def get_queryset(self):
-        return self.queryset.filter(user=self.request.user).order_by('-name')
 class IngredientsViewSet(BaseRecipeAttrViewSet):
     """Manage Ingredients in the Database"""
     serializer_class=serializers.IngredientsSerializer
